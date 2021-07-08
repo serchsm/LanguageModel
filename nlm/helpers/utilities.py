@@ -1,11 +1,11 @@
 import tensorflow as tf
 
-from Pathlib import Path
+from pathlib import Path
 
 def get_text_corpus():
     path_to_file = tf.keras.utils.get_file('shakespeare.txt',
                                            'https://storage.googleapis.com/download.tensorflow.org/data/shakespeare.txt')
-    with open(Path(path_to_file), model='r') as fid:
+    with open(Path(path_to_file), mode='r') as fid:
         text = fid.read()
     return text
 
