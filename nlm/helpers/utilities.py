@@ -20,9 +20,26 @@ def create_batched_inputs_targets(batch_size, windows):
     ds = tf.data.Dataset.from_tensor_slices(windows).shuffle(len(windows))
     return ds.map(split_input_target).batch(batch_size, drop_remainder=True).prefetch(4)
 
-def next_word(predictions, temperature=0.5):
-    scaled_logits = np.log(predictions)/temperature
-    return tf.random.categorical(np.array(scaled_logits), num_samples=1).numpy()[0]
+class TextGenerator():
+    def __init__(self, lm, number_words, tokenizer, ngram, temperature=1.0):
+        self.lm = lm
+        self.number_words = number_words
+        self.tokenizer = tokenizer
+        self.temperature = temperature
+        self.ngram = ngram
+    
+    def next_input(self, in_sequence):
+        return in_sequence[-self.ngram+1:]
 
-def next_input(in_sequence, ngram_order):
-    return in_sequence[-ngram_order+1:]
+    def sample_next_word(self, predictions):
+        scaled_logits = np.log(predictions)/self.temperature
+        return tf.random.categorical(np.array(scaled_logits), num_samples=1).numpy()[0]
+
+    def generate_text(self, next_sequence):
+        generated_sequence = next_sequence
+        for _ in range(self.number_words):
+            yhat = self.lm.predict(next_sequence)
+            next_index = self.sample_next_word(yhat)
+            generated_sequence = tf.concat([generated_sequence, next_index], axis=-1)
+            next_sequence = self.next_input(generated_sequence)
+        return self.tokenizer.generate_text(generated_sequence)

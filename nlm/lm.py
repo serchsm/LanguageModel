@@ -5,8 +5,10 @@ import tensorflow as tf
 from sklearn.model_selection import train_test_split
 
 from helpers import utilities
+from helpers.utilities import TextGenerator
 from Tokenizer.tokenizer import TextTokenizer
 from Models.language_models import ngram_lstm
+
 
 def main(args):
     text = utilities.get_text_corpus()
@@ -27,18 +29,11 @@ def main(args):
     ngram_lm.summary()
     ngram_lm.fit(training_dataset, epochs=args.epochs, validation_data=validation_dataset)
 
-    number_words = 10
-    generated_sequence = seed_sequence
-    next_sequence = seed_sequence
-    for _ in range(number_words):
-        yhat = ngram_lm.predict(next_sequence)
-        next_word_index = utilities.next_word(yhat, temperature=0.9)
-        generated_sequence = tf.concat([generated_sequence, next_word_index], axis=-1)
-        print(f"in_seq: {next_sequence}, next_ind: {next_word_index}, gen_seq: {generated_sequence}")
-        next_sequence = utilities.next_input(generated_sequence, args.ngram)
-        print(f"next iter seq: {next_sequence}")
-    print(f"Generated Text: {tokenizer.generate_text(generated_sequence)}")
-
+    for temperature in [0.5, 1.0, 1.5, 2.0]:
+        generator = TextGenerator(ngram_lm, args.number_words, tokenizer, args.ngram, temperature=temperature)
+        print(f"Temperature: {temperature}. Generated Text......")
+        print(f"{generator.generate_text(seed_sequence)}")
+        print("")
 
 
 if __name__ == "__main__":
@@ -50,6 +45,7 @@ if __name__ == "__main__":
     parser.add_argument('--embedding_size', type=int, default = 32, help = 'embedding size')
     # parser.add_argument('--number_layers', type=int, default=2, help='number layers')
     parser.add_argument('--lstm_units', type=int, default=256, help='number lstm units')
+    parser.add_argument('--number_words', type=int, default=100, help='Number words to generate with LM')
     args = parser.parse_args()
 
     main(args)
