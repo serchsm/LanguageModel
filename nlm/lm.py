@@ -19,8 +19,9 @@ def main(args):
     windows = utilities.generate_windows(args.ngram, encoded_text)
     train_windows, validation_windows = train_test_split(windows, test_size=0.1, random_state=42)
     seed_sequence = validation_windows[-1:][0][:-1]
-    print(f"w_length: {args.ngram}, windows: {windows[:10]}, seed_sequence= {seed_sequence}")
-    training_dataset = utilities.create_batched_inputs_targets(args.batch_size, train_windows[:100])
+    print(f"w_length: {args.ngram}, number train windows: {len(train_windows)}")
+    print(f"Number validation windows: {len(validation_windows)}, seed_sequence= {seed_sequence}")
+    training_dataset = utilities.create_batched_inputs_targets(args.batch_size, train_windows[:1000])
     validation_dataset = utilities.create_batched_inputs_targets(args.batch_size, validation_windows[:10])
     
     vocabulary_size = len(tokenizer.tokenizer.word_index)
