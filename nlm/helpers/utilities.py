@@ -1,3 +1,4 @@
+import numpy as np
 import tensorflow as tf
 
 from pathlib import Path
@@ -18,3 +19,10 @@ def split_input_target(window):
 def create_batched_inputs_targets(batch_size, windows):
     ds = tf.data.Dataset.from_tensor_slices(windows).shuffle(len(windows))
     return ds.map(split_input_target).batch(batch_size, drop_remainder=True).prefetch(4)
+
+def next_word(predictions, temperature=0.5):
+    scaled_logits = np.log(predictions)/temperature
+    return tf.random.categorical(np.array(scaled_logits), num_samples=1).numpy()[0]
+
+def next_input(in_sequence, ngram_order):
+    return in_sequence[-ngram_order+1:]

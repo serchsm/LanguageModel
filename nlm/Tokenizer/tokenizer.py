@@ -10,3 +10,6 @@ class TextTokenizer():
     
     def encode_text(self, text):
         return np.array(self.tokenizer.texts_to_sequences([text])) - 1
+
+    def generate_text(self, in_sequence):
+        return self.tokenizer.sequences_to_texts(in_sequence.numpy().reshape([1,-1])+1)
