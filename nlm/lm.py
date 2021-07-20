@@ -2,6 +2,7 @@ import argparse
 import numpy as np
 import tensorflow as tf
 
+from pathlib import Path
 from sklearn.model_selection import train_test_split
 
 from helpers import utilities
@@ -36,6 +37,10 @@ def main(args):
         print(f"{generator.generate_text(seed_sequence)}")
         print("")
 
+    trained_path = Path('./TrainedModels')
+    trained_path.mkdir(exist_ok=True)
+    trained_model_filename = trained_path / 'simple_nlm.h5'
+    ngram_lm.save(str(trained_model_filename))
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
