@@ -20,7 +20,9 @@ def split_input_target(window):
     return window[:-1], window[-1:]
 
 
-def create_batched_inputs_targets(batch_size, windows):
+def create_batched_inputs_targets(batch_size, windows, is_debug=False):
+    if is_debug:
+        windows = windows[:1000]
     ds = tf.data.Dataset.from_tensor_slices(windows).shuffle(len(windows))
     return ds.map(split_input_target).batch(batch_size, drop_remainder=True).prefetch(4)
 

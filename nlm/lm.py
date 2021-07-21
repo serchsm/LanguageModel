@@ -22,8 +22,10 @@ def main(args):
     seed_sequence = validation_windows[-1:][0][:-1]
     print(f"w_length: {args.ngram}, number train windows: {len(train_windows)}")
     print(f"Number validation windows: {len(validation_windows)}, seed_sequence= {seed_sequence}")
-    training_dataset = utilities.create_batched_inputs_targets(args.batch_size, train_windows[:1000])
-    validation_dataset = utilities.create_batched_inputs_targets(args.batch_size, validation_windows[:10])
+    training_dataset = utilities.create_batched_inputs_targets(args.batch_size, train_windows, is_debug=args.debug)
+    validation_dataset = utilities.create_batched_inputs_targets(args.batch_size,
+                                                                 validation_windows,
+                                                                 is_debug=args.debug)
     
     vocabulary_size = len(tokenizer.tokenizer.word_index)
     ngram_lm = ngram_lstm(vocabulary_size, args.embedding_size, args.lstm_units) 
@@ -56,6 +58,7 @@ if __name__ == "__main__":
     # parser.add_argument('--number_layers', type=int, default=2, help='number layers')
     parser.add_argument('--lstm_units', type=int, default=256, help='number lstm units')
     parser.add_argument('--number_words', type=int, default=100, help='Number words to generate with LM')
+    parser.add_argument('--debug', type=bool, default=False, help='If True, only use very few samples to train LM')
     args = parser.parse_args()
 
     main(args)
