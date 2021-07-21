@@ -32,7 +32,11 @@ def main(args):
     ngram_lm.fit(training_dataset, epochs=args.epochs, validation_data=validation_dataset)
 
     for temperature in [0.5, 1.0, 1.5, 2.0]:
-        generator = TextGenerator(ngram_lm, args.number_words, tokenizer, args.ngram, temperature=temperature)
+        generator = TextGenerator(ngram_lm,
+                                  args.number_words,
+                                  tokenizer, args.ngram,
+                                  temperature=temperature,
+                                  batch_size=args.batch_size)
         print(f"Temperature: {temperature}. Generated Text......")
         print(f"{generator.generate_text(seed_sequence)}")
         print("")

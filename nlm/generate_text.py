@@ -20,10 +20,11 @@ def main(args):
     seed_index = np.random.choice(len(windows))
 
     for temperature in [0.1, 0.5, 1.0, 1.5, 2.0, 5.0]:
-        tg = TextGenerator(nlm, 50, tokenizer, args.ngram_order, temperature=temperature)
-        seed_sequence = tf.constant(windows[seed_index])
-        print(f"Temperature: {temperature}. Seed Sequence: {seed_sequence}. Generated Text......")
-        print(f"{tg.generate_text(windows[seed_index])}")
+        tg = TextGenerator(nlm, 50, tokenizer, args.ngram_order, temperature=temperature, batch_size=args.batch_size)
+        seed_sequence = windows[seed_index][:-1]
+        print(f"Temperature: {temperature}. Seed: {tokenizer.generate_text(seed_sequence)[0]}")
+        print("Generated Text......")
+        print(f"{tg.generate_text(seed_sequence)}")
         print("")
 
 
@@ -31,4 +32,5 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("--model_type", type=str, default='simple', help="Type of model to load. One of 'simple', ")
     parser.add_argument("--ngram_order", type=int, default=4, help="Order of trained LM")
+    parser.add_argument("--batch_size", type=int, default=4, help="Batch size value used during training")
     main(parser.parse_args())

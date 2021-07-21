@@ -26,12 +26,13 @@ def create_batched_inputs_targets(batch_size, windows):
 
 
 class TextGenerator():
-    def __init__(self, lm, number_words, tokenizer, ngram, temperature=1.0):
+    def __init__(self, lm, number_words, tokenizer, ngram, temperature=1.0, batch_size=4):
         self.lm = lm
         self.number_words = number_words
         self.tokenizer = tokenizer
         self.temperature = temperature
         self.ngram = ngram
+        self.batch_size = batch_size
 
     def next_input(self, in_sequence):
         return in_sequence[-self.ngram + 1:]
@@ -40,11 +41,15 @@ class TextGenerator():
         scaled_logits = np.log(predictions) / self.temperature
         return tf.random.categorical(np.array(scaled_logits), num_samples=1).numpy()[0]
 
+    def generate_batch(self, x_in):
+        return np.tile(x_in.reshape((1, self.ngram-1)), [self.batch_size, 1])
+
     def generate_text(self, next_sequence):
         generated_sequence = next_sequence
         for _ in range(self.number_words):
-            yhat = self.lm.predict(next_sequence)
+            # Bug due to not implementing batched input
+            yhat = self.lm.predict(self.generate_batch(next_sequence))
             next_index = self.sample_next_word(yhat)
-            generated_sequence = tf.concat([generated_sequence, next_index], axis=-1)
+            generated_sequence = np.concatenate([generated_sequence, next_index])
             next_sequence = self.next_input(generated_sequence)
-        return self.tokenizer.generate_text(generated_sequence)
+        return self.tokenizer.generate_text(generated_sequence)[0]
