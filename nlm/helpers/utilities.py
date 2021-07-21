@@ -20,7 +20,9 @@ def split_input_target(window):
     return window[:-1], window[-1:]
 
 
-def create_batched_inputs_targets(batch_size, windows):
+def create_batched_inputs_targets(batch_size, windows, is_debug=False):
+    if is_debug:
+        windows = windows[:1000]
     ds = tf.data.Dataset.from_tensor_slices(windows).shuffle(len(windows))
     return ds.map(split_input_target).batch(batch_size, drop_remainder=True).prefetch(4)
 
@@ -39,7 +41,9 @@ class TextGenerator():
 
     def sample_next_word(self, predictions):
         scaled_logits = np.log(predictions) / self.temperature
-        return tf.random.categorical(np.array(scaled_logits), num_samples=1).numpy()[0]
+        new_distribution = np.exp(scaled_logits)
+        new_distribution /= np.sum(new_distribution, axis=-1, keepdims=True)
+        return np.asarray([np.random.choice(new_distribution.shape[1], p=new_distribution[0])])
 
     def generate_batch(self, x_in):
         return np.tile(x_in.reshape((1, self.ngram-1)), [self.batch_size, 1])
