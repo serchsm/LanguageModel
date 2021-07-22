@@ -30,7 +30,7 @@ def main(args):
         ngram_lm = ngram_lstm(vocabulary_size, args.embedding_size, args.lstm_units)
     else:
         glove = GloveEmbeddings("http://nlp.stanford.edu/data/glove.6B.zip", Path("./Embeddings/glove.6B.zip"), 50)
-        glove.get_embedding()
+        pretrained_embedding = glove.build_embedding_matrix(tokenizer.tokenizer.word_index)
         # ngram_lm = ngram_lstm_with_pretrained_embeddings(vocabulary_size, embedding_matrix, args.lstm_units)
     ngram_lm.compile(loss="sparse_categorical_crossentropy", optimizer="adam", metrics=['acc'])
     ngram_lm.summary()
