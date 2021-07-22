@@ -7,8 +7,9 @@ from sklearn.model_selection import train_test_split
 
 from helpers import utilities
 from helpers.utilities import TextGenerator
-from Tokenizer.tokenizer import TextTokenizer
+from Embeddings.embeddings import GloveEmbeddings
 from Models.language_models import ngram_lstm, ngram_lstm_with_pretrained_embeddings
+from Tokenizer.tokenizer import TextTokenizer
 
 
 def main(args):
@@ -27,8 +28,10 @@ def main(args):
     early_stopping_cb = tf.keras.callbacks.EarlyStopping(monitor='loss', patience=5, restore_best_weights=True)
     if args.model == 'ngram_lstm':
         ngram_lm = ngram_lstm(vocabulary_size, args.embedding_size, args.lstm_units)
-    # else:
-    #     ngram_lm = ngram_lstm_with_pretrained_embeddings(vocabulary_size, embedding_matrix, args.lstm_units)
+    else:
+        glove = GloveEmbeddings("http://nlp.stanford.edu/data/glove.6B.zip", Path("./Embeddings/glove.6B.zip"), 50)
+        glove.get_embedding()
+        # ngram_lm = ngram_lstm_with_pretrained_embeddings(vocabulary_size, embedding_matrix, args.lstm_units)
     ngram_lm.compile(loss="sparse_categorical_crossentropy", optimizer="adam", metrics=['acc'])
     ngram_lm.summary()
     ngram_lm.fit(training_dataset, epochs=args.epochs, callbacks=[early_stopping_cb])
