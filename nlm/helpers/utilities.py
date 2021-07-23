@@ -51,7 +51,6 @@ class TextGenerator():
     def generate_text(self, next_sequence):
         generated_sequence = next_sequence
         for _ in range(self.number_words):
-            # Bug due to not implementing batched input
             yhat = self.lm.predict(self.generate_batch(next_sequence))
             next_index = self.sample_next_word(yhat)
             generated_sequence = np.concatenate([generated_sequence, next_index])
