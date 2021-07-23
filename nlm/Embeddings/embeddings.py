@@ -8,7 +8,6 @@ from abc import ABC
 class PretrainedEmbeddings():
     def __init__(self, url, save_as):
         self.url = url
-        # self.file_path = Path("./Embeddings/glove.6B.zip")
         self.file_path = save_as
 
     def download_file(self):
@@ -64,6 +63,6 @@ class GloveEmbeddings(PretrainedEmbeddings):
                 hits += 1
             else:
                 misses += 1
-        print(f"hits: {hits}, misses: {misses}")
+        print(f"Embedding lookup hits: {hits}, misses: {misses}")
         return embedding_matrix
 
