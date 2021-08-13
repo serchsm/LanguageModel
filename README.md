@@ -2,6 +2,7 @@
 
 Code creates a neural LMs based on Shakespeare text. It trains a word based LM using n-grams and generates text by 
 sampling from the predicted distribution of the next word.  
+
 The LMs can learn its own embeddings or use pre-trained GloVe embeddings. Next, there are two stacked LSTMs layers, and 
 the final layer is a dense layer that maps to the output vocabulary (words in corpus).
 
