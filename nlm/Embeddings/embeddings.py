@@ -12,10 +12,12 @@ class PretrainedEmbeddings():
 
     def download_file(self):
         if not self.file_path.is_file():
+            print("Downloading embedding file...")
             file_stream = requests.get(self.url, allow_redirects=True, stream=True)
             with open(Path(self.file_path), mode="wb") as local_file:
                 for chunk in file_stream:
                     local_file.write(chunk)
+            print(f"Done")
 
     def parse_embedding_file(self):
         pass
